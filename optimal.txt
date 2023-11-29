@@ -1,0 +1,115 @@
+#include <iostream>
+#include <queue>
+#include <unordered_set>
+using namespace std;
+
+class OptimalPageReplacement
+{
+private:
+    int frameCount;
+    int arr[1000];
+    int current = 0;
+    int future = 0;
+    int page[1000];
+    int ultimatemax=1000;
+    int pageCount1;
+public:
+    OptimalPageReplacement(int frames,int pageReference[],int pageCount)
+    {
+        frameCount = frames;
+        pageCount1 = pageCount;
+        for (int i = 0; i < frames; i++)
+        {
+            arr[i]=-1;
+        }
+        for (int i = 0; i < pageCount; i++)
+        {
+            page[i] = pageReference[i];
+        }
+    }
+
+    void replacePages(int pages)
+    {
+
+        cout << endl;
+        for (int i = 0; i < frameCount; ++i)
+        {
+            if (pages == arr[i])
+            {
+                cout << "No replcement";
+                future++;
+                return;
+            }
+        }
+        if (current >= 0 && current <= frameCount-1)
+        {
+            arr[current] = pages;
+            current++;
+            future++;
+        }
+        else
+        {
+            int distance[frameCount];
+            
+            // cout<<past<<endl;
+            for (int i = 0; i <= frameCount-1; i++)
+            {
+                for (int j = future ; j<pageCount1; j++)
+                {
+                    if (arr[i] == page[j])
+                    {
+                        // cout<<arr[i]<<" "<<page[j]<<endl;
+                        distance[i] = j;
+                        // cout<<distance[i]<<endl;
+                        break;
+                    }
+                    else{
+                        distance[i] = ultimatemax++;
+                    }
+                }
+            }
+            int max = -1;
+            int index;
+            for (int i = 0; i < frameCount; i++)
+            {
+                if (distance[i] > max)
+                {
+                    max = distance[i];
+                    index = i;
+                }
+            }
+            arr[index] = pages;
+            future++;
+        }
+        for (int i = 0; i < frameCount; ++i)
+        {
+            cout << arr[i];
+        }
+    }
+};
+
+int main()
+{
+    int numofpages;
+    cout<<"Enter number of pages: ";
+    cin>>numofpages;
+
+    int pageReference[numofpages];
+
+    for(int i=0;i<numofpages;i++){
+        cin>>pageReference[i];
+    }
+
+    int frameCount ;
+    cout<<"Enter the Frame count: ";
+    cin>>frameCount;
+    cout<<endl;
+    int pageCount = sizeof(pageReference) / sizeof(pageReference[0]);
+    OptimalPageReplacement fif(frameCount,pageReference,pageCount);
+    for (int i = 0; i < pageCount; i++)
+    {
+        fif.replacePages(pageReference[i]);
+    }
+
+    return 0;
+}

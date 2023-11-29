@@ -1,0 +1,70 @@
+#include <iostream>
+#include <climits>
+
+using namespace std;
+
+int main() {
+    int n; 
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    int bt[n]; 
+    int at[n]; 
+    int wt[n]; 
+    int tat[n]; 
+    bool completed[n] = {false}; 
+
+    
+    cout << "Enter burst times and arrival times for each process:\n";
+    for (int i = 0; i < n; i++) {
+        cout << "Process " << i + 1 << " (Burst Time Arrival Time): ";
+        cin >> bt[i] >> at[i];
+    }
+
+    int total_time = 0; 
+    int completed_processes = 0;
+
+    while (completed_processes < n) {
+        int shortest = INT_MAX;
+        int shortest_idx = -1;
+
+    
+        for (int i = 0; i < n; i++) {
+            if (!completed[i] && at[i] <= total_time && bt[i] < shortest) {
+                shortest = bt[i];
+                shortest_idx = i;
+            }
+        }
+
+        if (shortest_idx == -1) {
+            
+            total_time++;
+        } else {
+            completed[shortest_idx] = true;
+
+            wt[shortest_idx] = total_time - at[shortest_idx];
+            tat[shortest_idx] = wt[shortest_idx] + bt[shortest_idx];
+
+            total_time += bt[shortest_idx];
+            completed_processes++;
+        }
+    }
+
+    float avg_wt = 0, avg_tat = 0;
+    for (int i = 0; i < n; i++) {
+        avg_wt += wt[i];
+        avg_tat += tat[i];
+    }
+    avg_wt /= n;
+    avg_tat /= n;
+
+    cout << "Process\tBurst Time\tArrival Time\tWaiting Time\tTurnaround Time\n";
+    for (int i = 0; i < n; i++) {
+        cout << i + 1 << "\t" << bt[i] << "\t\t" << at[i] << "\t\t" << wt[i] << "\t\t" << tat[i] << "\n";
+    }
+
+    cout << "Average Waiting Time: " << avg_wt << "\n";
+    cout << "Average Turnaround Time: " << avg_tat << "\n";
+
+    return 0;
+}

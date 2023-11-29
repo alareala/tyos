@@ -1,0 +1,98 @@
+choice=0
+
+while [ $choice -lt 10 ]
+do
+	echo "
+	1. Present Working Directory
+	2. List all Files
+	3. Get User
+	4. Change Directory
+	5. Date
+	6. History
+	7. Create File
+	8. Remove File
+	9. Create Directory
+	10. Remove Directory
+	11. EXIT
+	Enter Your Choice"
+
+	read choice
+
+	case "$choice" in
+	"1") echo ""
+		echo "Using pwd Command"
+		pwd
+		echo ""
+	;;
+
+	"2") echo ""
+		echo "Using ls Command"
+		ls
+		echo ""
+	;;
+
+	"3") echo ""
+		echo "Using whoami Command"
+		whoami
+		echo ""
+	;;
+
+	"4") echo ""
+		echo "Using cd Command"
+		echo "Enter Directory Name:"
+		read dname
+		cd ${dname}
+		echo "Directory Changed"
+	;;
+
+	"5") echo ""
+		echo "Using date Command"
+		date
+		echo ""
+	;;
+
+	"6") echo ""
+		echo "Using history Command"
+		history
+		echo ""
+	;;
+
+	"7") echo ""
+		echo "Using touch Command"
+		echo "Enter Filename to be created"
+		read fname
+		touch ${fname}
+		echo "File Created
+	"
+	;;
+
+	"8") echo ""
+		echo "Using rm Command"
+		echo "Enter Filename to be deleted"
+		read fname
+		rm ${fname}
+		echo "File Deleted
+	"
+	;;
+
+	"9") echo ""
+		echo "Using mkdir Command"
+		echo "Enter Directory to be created"
+		read dname
+		mkdir ${dname}
+		echo "Directory Created
+	"
+	;;
+
+	"10") echo ""
+		echo "Using rmdir Command"
+		echo "Enter Directory to be deleted"
+		read dname
+		rmdir ${dname}
+		echo "Directory Deleted
+		"
+	;;
+
+	esac
+
+done

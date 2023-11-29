@@ -1,0 +1,76 @@
+#include <iostream>
+#include <queue>
+#include <unordered_set>
+using namespace std;
+
+class FIFOPageReplacement
+{
+private:
+    int frameCount;
+    int current = 0;
+    int arr[1000];
+public:
+    
+    FIFOPageReplacement(int frames)
+    {
+        frameCount = frames;
+        for (int i = 0; i < frames; i++)
+        {
+            arr[i] = -1;
+        }
+    }
+
+    void replacePages(int pages)
+    {
+        cout<<endl;
+        for (int i = 0; i < frameCount; ++i)
+        {
+            if (pages == arr[i])
+            {
+                cout<<"No replcement";
+                return;
+            }
+        }
+        if (current >= 0 && current <= frameCount-1)
+        {
+            arr[current] = pages;
+            current++;
+        }
+        else
+        {
+            current = 0;
+            arr[current] = pages;
+            current++;
+        }
+        for (int i = 0; i < frameCount; ++i)
+        {
+            cout<<arr[i];
+        }
+    }
+};
+
+int main()
+{
+    int numofpages;
+    cout<<"Enter number of pages: ";
+    cin>>numofpages;
+
+    int pageReference[numofpages];
+
+    for(int i=0;i<numofpages;i++){
+        cin>>pageReference[i];
+    }
+
+    int frameCount;
+    cout<<"Enter the frame count: ";
+    cin>>frameCount;
+    cout<<endl;
+    int pageCount = sizeof(pageReference) / sizeof(pageReference[0]);
+    FIFOPageReplacement fif(frameCount);
+    for (int i = 0; i < pageCount; i++)
+    {
+        fif.replacePages(pageReference[i]);
+    }
+
+    return 0;
+}

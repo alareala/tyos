@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+echo "Enter the file name : "
+read filename
+
+cat -n $filename | sort -k2 | uniq -f1 | sort -k1 | cut -f2

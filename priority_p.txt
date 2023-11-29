@@ -1,0 +1,110 @@
+#include<iostream>
+using namespace std;
+
+struct Process {
+    int id;
+    int arrivalTime;
+    int burstTime;
+    int priority;
+    int remainingTime;
+};
+
+void swap(Process& p1, Process& p2) {
+    Process temp = p1;
+    p1 = p2;
+    p2 = temp;
+}
+
+bool compareArrival(const Process& p1, const Process& p2) {
+    return p1.arrivalTime < p2.arrivalTime;
+}
+
+bool comparePriority(const Process& p1, const Process& p2) {
+    return p1.priority < p2.priority;
+}
+
+int main() {
+    int n;
+    cout << "Enter the number of Processes: ";
+    cin >> n;
+
+    Process processes[10];
+
+    for(int i = 0; i < n; ++i) {
+        processes[i].id = i + 1;
+        cout << "Enter arrival time of process " << i + 1 << ": ";
+        cin >> processes[i].arrivalTime;
+        cout << "Enter burst time of process " << i + 1 << ": ";
+        cin >> processes[i].burstTime;
+        cout << "Enter priority of process " << i + 1 << ": ";
+        cin >> processes[i].priority;
+        processes[i].remainingTime = processes[i].burstTime;
+    }
+
+    // Sort based on arrival time
+    for (int i = 0; i < n - 1; ++i) {
+        for (int j = 0; j < n - i - 1; ++j) {
+            if (processes[j].arrivalTime > processes[j + 1].arrivalTime) {
+                swap(processes[j], processes[j + 1]);
+            }
+        }
+    }
+
+    int currentTime = 0;
+    int completionTimes[10] = {0};
+
+    while (true) {
+        if (currentTime < processes[0].arrivalTime) {
+            currentTime = processes[0].arrivalTime;
+        }
+
+        int smallestPriorityIdx = -1;
+        int smallestPriority = INT_MAX;
+
+        for (int i = 0; i < n; ++i) {
+            if (processes[i].remainingTime > 0 && processes[i].arrivalTime <= currentTime &&
+                processes[i].priority < smallestPriority) {
+                smallestPriority = processes[i].priority;
+                smallestPriorityIdx = i;
+            }
+        }
+
+        if (smallestPriorityIdx == -1) {
+            break; // All processes are completed
+        }
+
+        Process& currentProcess = processes[smallestPriorityIdx];
+
+        cout << "Executing process p" << currentProcess.id << " at time " << currentTime << endl;
+        currentProcess.remainingTime--;
+        currentTime++;
+
+        if (currentProcess.remainingTime == 0) {
+            completionTimes[currentProcess.id - 1] = currentTime;
+        }
+    }
+
+    double avgWaitingTime = 0.0;
+    double avgTurnaroundTime = 0.0;
+
+    cout << "\nProcess\tBurst Time\tArrival Time\tWaiting Time\tTurnaround Time\tCompletion Time\tPriority\n";
+    for (int i = 0; i < n; ++i) {
+        int turnaroundTime = completionTimes[i] - processes[i].arrivalTime;
+        int waitingTime = turnaroundTime - processes[i].burstTime;
+
+        avgWaitingTime += waitingTime;
+        avgTurnaroundTime += turnaroundTime;
+
+        cout << "p" << processes[i].id << "\t\t" << processes[i].burstTime << "\t\t" << processes[i].arrivalTime
+             << "\t\t" << waitingTime << "\t\t" << turnaroundTime << "\t\t" << completionTimes[i]
+             << "\t\t" << processes[i].priority << endl;
+    }
+
+    avgWaitingTime /= n;
+    avgTurnaroundTime /= n;
+
+    cout << "\nAverage Waiting Time = " << avgWaitingTime << endl;
+    cout << "Average Turnaround Time = " << avgTurnaroundTime << endl;
+
+    return 0;
+}

@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+echo "Enter File Name to be deleted : "
+read filename
+
+if [ -e $filename ]
+then
+	echo "File existing. "
+	if [ -s $filename ]
+	then
+		echo "File is not empty"
+	else
+		echo "This file is empty."
+		rm $filename
+		echo "File deleted successfully."
+	fi
+else
+	echo "File does not exist"
+fi

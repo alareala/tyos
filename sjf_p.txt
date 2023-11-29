@@ -1,0 +1,74 @@
+#include <iostream>
+#include <climits>
+
+using namespace std;
+
+int main() {
+    int n; 
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    int bt[n]; 
+    int at[n]; 
+    int wt[n]; 
+    int tat[n]; 
+    int remaining_time[n];
+
+    cout << "Enter burst times and arrival times for each process:\n";
+    for (int i = 0; i < n; i++) {
+        cout << "Process " << i + 1 << " (Burst Time Arrival Time): ";
+        cin >> bt[i] >> at[i];
+        remaining_time[i] = bt[i];
+    }
+
+    int total_time = 0; 
+    int completed_processes = 0;
+
+    while (completed_processes < n) {
+        int shortest = INT_MAX;
+        int shortest_idx = -1;
+        bool all_completed = true;
+
+        for (int i = 0; i < n; i++) {
+            if (at[i] <= total_time && remaining_time[i] > 0) {
+                all_completed = false;
+                if (remaining_time[i] < shortest) {
+                    shortest = remaining_time[i];
+                    shortest_idx = i;
+                }
+            }
+        }
+
+        if (all_completed) {
+            total_time++;
+        } else {
+            remaining_time[shortest_idx]--;
+
+            if (remaining_time[shortest_idx] == 0) {
+                completed_processes++;
+                wt[shortest_idx] = total_time - at[shortest_idx] - bt[shortest_idx];
+                tat[shortest_idx] = wt[shortest_idx] + bt[shortest_idx];
+            }
+
+            total_time++;
+        }
+    }
+
+    float avg_wt = 0, avg_tat = 0;
+    for (int i = 0; i < n; i++) {
+        avg_wt += wt[i];
+        avg_tat += tat[i];
+    }
+    avg_wt /= n;
+    avg_tat /= n;
+
+    cout << "Process\tBurst Time\tArrival Time\tWaiting Time\tTurnaround Time\n";
+    for (int i = 0; i < n; i++) {
+        cout << i + 1 << "\t" << bt[i] << "\t\t" << at[i] << "\t\t" << wt[i]+1 << "\t\t" << tat[i]+1 << "\n";
+    }
+
+    cout << "Average Waiting Time: " << avg_wt << "\n";
+    cout << "Average Turnaround Time: " << avg_tat << "\n";
+
+    return 0;
+}

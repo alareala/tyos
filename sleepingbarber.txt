@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+#define MAX_CUSTOMERS 25
+
+// Function prototypes
+void *customer(void *num);
+void *barber(void *);
+void randwait(int secs);
+
+// Semaphores declaration
+sem_t waitingRoom;    // Semaphore for the waiting room
+sem_t barberChair;    // Semaphore for the barber chair
+sem_t barberPillow;   // Semaphore for the barber's pillow
+sem_t seatBelt;       // Semaphore for the seat belt
+
+int allDone = 0; // Flag to indicate the end of all operations
+
+int main() {
+    pthread_t btid; // Barber thread ID
+    pthread_t tid[MAX_CUSTOMERS]; // Customer thread IDs
+    long RandSeed;
+    int i, numCustomers, numChairs;
+    int Number[MAX_CUSTOMERS];
+
+    printf("\n\t----- Sleeping Barber Problem-----\n");
+    printf("\nEnter the number of Customers : ");
+    scanf("%d", &numCustomers);
+    printf("\nEnter the number of Chairs : ");
+    scanf("%d", &numChairs);
+
+    if (numCustomers > MAX_CUSTOMERS) {
+        printf("\nThe maximum number of Customers are %d.\n", MAX_CUSTOMERS);
+        exit(-1);
+    }
+
+    for (i = 0; i < MAX_CUSTOMERS; i++) {
+        Number[i] = i;
+    }
+
+    // Initialize semaphores with their initial values
+    sem_init(&waitingRoom, 0, numChairs);
+    sem_init(&barberChair, 0, 1);
+    sem_init(&barberPillow, 0, 0);
+    sem_init(&seatBelt, 0, 0);
+
+    // Create the barber thread
+    pthread_create(&btid, NULL, barber, NULL);
+
+    // Create customer threads
+    for (i = 0; i < numCustomers; i++) {
+        pthread_create(&tid[i], NULL, customer, (void *)&Number[i]);
+        sleep(1); // Wait for 1 second between customer creation
+    }
+
+    // Wait for customer threads to finish
+    for (i = 0; i < numCustomers; i++) {
+        pthread_join(tid[i], NULL);
+        sleep(1); // Wait for 1 second between customer join
+    }
+
+    allDone = 1;
+    sem_post(&barberPillow); // Signal the barber to finish
+
+    // Wait for the barber thread to finish
+    pthread_join(btid, NULL);
+}
+
+// Customer thread function
+void *customer(void *number) {
+    int num = *(int *)number;
+    printf("\nCustomer %d going to barber shop.\n", num);
+    randwait(2);
+    printf("\nCustomer %d arrived at barber shop.\n", num);
+
+    sem_wait(&waitingRoom);
+    printf("\nCustomer %d entering waiting room.\n", num);
+    sem_wait(&barberChair);
+    sem_post(&waitingRoom);
+    printf("\nCustomer %d waking up the barber.\n", num);
+    sem_post(&barberPillow);
+    sem_wait(&seatBelt);
+    sem_post(&barberChair);
+    printf("\nCustomer %d leaving the barber shop.\n", num);
+}
+
+// Barber thread function
+void *barber(void *junk) {
+    while (!allDone) {
+        printf("\nThe barber is sleeping\n");
+        sem_wait(&barberPillow);
+        if (!allDone) {
+            printf("\nThe barber is cutting hair\n");
+            randwait(2);
+            printf("\nThe barber has finished cutting hair.\n");
+            sem_post(&seatBelt);
+        } else {
+            printf("\nThe barber is calling it a day.\n");
+        }
+    }
+}
+
+// Function to simulate random wait time
+void randwait(int secs) {
+    int len;
+    len = (int)((1 * secs) + 1);
+    sleep(len);
+}
